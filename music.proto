@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package music;
+
+import "google/protobuf/empty.proto";
+
+// ==========================
+//        MENSAGENS
+// ==========================
+
+message User {
+  int32 id = 1;
+  string username = 2;
+  string full_name = 3;
+  int32 age = 4;
+}
+
+message Track {
+  int32 id = 1;
+  string title = 2;
+  string artist = 3;
+  string file_path = 4;
+}
+
+message Playlist {
+  int32 id = 1;
+  string name = 2;
+  int32 owner_id = 3;
+}
+
+message UserId {
+  int32 id = 1;
+}
+
+message PlaylistId {
+  int32 id = 1;
+}
+
+message TrackId {
+  int32 id = 1;
+}
+
+// ==========================
+//        LISTAGENS
+// ==========================
+
+message UserList {
+  repeated User users = 1;
+}
+
+message TrackList {
+  repeated Track tracks = 1;
+}
+
+message PlaylistList {
+  repeated Playlist playlists = 1;
+}
+
+// ==========================
+//        SERVIÇO
+// ==========================
+
+service MusicService {
+  rpc ListUsers (google.protobuf.Empty) returns (UserList);
+  rpc ListTracks (google.protobuf.Empty) returns (TrackList);
+
+  rpc PlaylistsOfUser (UserId) returns (PlaylistList);
+  rpc TracksOfPlaylist (PlaylistId) returns (TrackList);
+  rpc PlaylistsContainingTrack (TrackId) returns (PlaylistList);
+
+  // Substitui o endpoint de streaming de áudio
+  rpc TrackInfo (TrackId) returns (Track);
+}

@@ -9,6 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String, nullable=True)
+    age = Column(Integer, nullable=True)
 
     playlists = relationship("Playlist", back_populates="owner")
 
@@ -18,8 +19,7 @@ class Track(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     artist = Column(String, nullable=True)
-    album = Column(String, nullable=True)
-    duration = Column(Integer, nullable=True)
+
     file_path = Column(Text, nullable=True)
 
     playlists = relationship(
@@ -31,7 +31,7 @@ class Playlist(Base):
     __tablename__ = "playlists"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
+
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="playlists")

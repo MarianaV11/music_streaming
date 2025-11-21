@@ -6,7 +6,13 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.121.2",
+    "graphene>=3.4.3",
+    "grpcio>=1.76.0",
+    "grpcio-tools>=1.76.0",
+    "lxml>=6.0.2",
     "pydantic>=2.12.4",
+    "spyne>=2.14.0",
     "sqlalchemy>=2.0.44",
+    "starlette-graphene3>=0.6.0",
     "uvicorn>=0.38.0",
 ]

@@ -12,50 +12,60 @@ from schemas.streaming_schemas import PlaylistOut, TrackOut, UserOut
 router = APIRouter()
 
 
-# Endpoint 1: listar todos os usuários
 @router.get("/users", response_model=List[UserOut])
 def list_users(db: Session = Depends(get_db)):
+    """
+    List of all users.
+    """
     return db.query(User).all()
 
 
-# Endpoint 2: listar todas as músicas
 @router.get("/tracks", response_model=List[TrackOut])
 def list_tracks(db: Session = Depends(get_db)):
+    """
+    List all the tracks available in db.
+    """
     return db.query(Track).all()
 
 
-# Endpoint 3: listar playlists de um usuário
 @router.get("/users/{user_id}/playlists", response_model=List[PlaylistOut])
 def playlists_of_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    List all the playlists of a specific user.
+    """
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     return user.playlists
 
 
-# Endpoint 4: listar todas as músicas de uma playlist
 @router.get("/playlists/{playlist_id}/tracks", response_model=List[TrackOut])
 def tracks_of_playlist(playlist_id: int, db: Session = Depends(get_db)):
+    """
+    List all the musics(tracks) in a playlist.
+    """
     playlist = db.query(Playlist).filter(Playlist.id == playlist_id).first()
     if not playlist:
         raise HTTPException(status_code=404, detail="Playlist não encontrada")
     return playlist.tracks
 
 
-# Endpoint 5: listar todas as playlists que contêm uma música
 @router.get("/tracks/{track_id}/playlists", response_model=List[PlaylistOut])
 def playlists_containing_track(track_id: int, db: Session = Depends(get_db)):
+    """
+    Return all the playlists that contain a specific track.
+    """
     track = db.query(Track).filter(Track.id == track_id).first()
     if not track:
         raise HTTPException(status_code=404, detail="Música não encontrada")
     return track.playlists
 
 
-# =============================
-# STREAM REAL COM ACEITAÇÃO DE RANGE
-# =============================
 @router.get("/stream/{track_id}")
 async def stream_track(track_id: int, request: Request, db: Session = Depends(get_db)):
+    """
+    Return the music by it's id.
+    """
     track = db.query(Track).filter(Track.id == track_id).first()
 
     if not track:
