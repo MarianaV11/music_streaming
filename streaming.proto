@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package music;
+
+// ================================
+//         TIPOS (MODELOS)
+// ================================
+
+message User {
+  int32 id = 1;
+  string username = 2;
+  string full_name = 3;
+  int32 age = 4;
+}
+
+message Track {
+  int32 id = 1;
+  string title = 2;
+  string artist = 3;
+  string file_path = 4;
+  int32 duration = 5;
+}
+
+message Playlist {
+  int32 id = 1;
+  string name = 2;
+  User owner = 3;
+  repeated Track tracks = 4;
+}
+
+// ================================
+//         REQUESTS / RESPONSES
+// ================================
+
+message EmptyRequest {}
+
+message UserIdRequest {
+  int32 user_id = 1;
+}
+
+message PlaylistIdRequest {
+  int32 playlist_id = 1;
+}
+
+message TrackIdRequest {
+  int32 track_id = 1;
+}
+
+message UsersResponse {
+  repeated User users = 1;
+}
+
+message TracksResponse {
+  repeated Track tracks = 1;
+}
+
+message PlaylistsResponse {
+  repeated Playlist playlists = 1;
+}
+
+message TrackResponse {
+  Track track = 1;
+}
+
+// ================================
+//             SERVIÇO
+// ================================
+
+service MusicService {
+
+  // GET /users
+  rpc GetUsers(EmptyRequest) returns (UsersResponse);
+
+  // GET /tracks
+  rpc GetTracks(EmptyRequest) returns (TracksResponse);
+
+  // GET /users/{id}/playlists
+  rpc PlaylistsOfUser(UserIdRequest) returns (PlaylistsResponse);
+
+  // GET /playlists/{id}/tracks
+  rpc TracksOfPlaylist(PlaylistIdRequest) returns (TracksResponse);
+
+  // GET /tracks/{id}/playlists
+  rpc PlaylistsContainingTrack(TrackIdRequest) returns (PlaylistsResponse);
+
+  // GET /stream/{id}
+  rpc TrackInfo(TrackIdRequest) returns (TrackResponse);
+}

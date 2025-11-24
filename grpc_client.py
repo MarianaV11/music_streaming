@@ -1,58 +1,61 @@
 import grpc
-from google.protobuf.empty_pb2 import Empty
+import streaming_pb2
+import streaming_pb2_grpc
 
-import music_pb2
-import music_pb2_grpc
+channel = grpc.insecure_channel("localhost:50051")
+client = streaming_pb2_grpc.MusicServiceStub(channel)
 
+# ============================================================
+# 1) GetUsers
+# ============================================================
+print("\n=== 1) USERS ===")
+resp = client.GetUsers(streaming_pb2.EmptyRequest())
+for u in resp.users:
+    print(f"{u.id} - {u.username} ({u.full_name}) age={u.age}")
 
-class MusicClient:
-    def __init__(self):
-        self.channel = grpc.insecure_channel("localhost:50051")
-        self.stub = music_pb2_grpc.MusicServiceStub(self.channel)
+# ============================================================
+# 2) GetTracks
+# ============================================================
+print("\n=== 2) TRACKS ===")
+resp = client.GetTracks(streaming_pb2.EmptyRequest())
+for t in resp.tracks:
+    print(f"{t.id} - {t.title} by {t.artist}")
 
-    def list_users(self):
-        response = self.stub.ListUsers(Empty())
-        return response.users
+# ============================================================
+# 3) PlaylistsOfUser
+# ============================================================
+print("\n=== 3) PLAYLISTS OF USER 1 ===")
+resp = client.PlaylistsOfUser(streaming_pb2.UserIdRequest(user_id=1))
+for p in resp.playlists:
+    print(f"{p.id} - {p.name} (owner: {p.owner.username})")
+    for t in p.tracks:
+        print(f"   • {t.id} - {t.title}")
 
-    def list_tracks(self):
-        response = self.stub.ListTracks(Empty())
-        return response.tracks
+# ============================================================
+# 4) TracksOfPlaylist
+# ============================================================
+print("\n=== 4) TRACKS OF PLAYLIST 1 ===")
+resp = client.TracksOfPlaylist(streaming_pb2.PlaylistIdRequest(playlist_id=1))
+for t in resp.tracks:
+    print(f"{t.id} - {t.title} by {t.artist}")
 
-    def playlists_of_user(self, user_id):
-        request = music_pb2.UserId(id=user_id)
-        response = self.stub.PlaylistsOfUser(request)
-        return response.playlists
+# ============================================================
+# 5) PlaylistsContainingTrack
+# ============================================================
+print("\n=== 5) PLAYLISTS CONTAINING TRACK 1 ===")
+resp = client.PlaylistsContainingTrack(streaming_pb2.TrackIdRequest(track_id=3))
+for p in resp.playlists:
+    print(f"{p.id} - {p.name} (owner: {p.owner.username})")
 
-    def tracks_of_playlist(self, playlist_id):
-        request = music_pb2.PlaylistId(id=playlist_id)
-        response = self.stub.TracksOfPlaylist(request)
-        return response.tracks
-
-    def playlists_containing_track(self, track_id):
-        request = music_pb2.TrackId(id=track_id)
-        response = self.stub.PlaylistsContainingTrack(request)
-        return response.playlists
-
-    def track_info(self, track_id):
-        request = music_pb2.TrackId(id=track_id)
-        return self.stub.TrackInfo(request)
-
-
-if __name__ == "__main__":
-    client = MusicClient()
-
-    print("\n=== USERS ===")
-    for u in client.list_users():
-        print(f"{u.id} - {u.username}")
-
-    print("\n=== TRACKS ===")
-    for t in client.list_tracks():
-        print(f"{t.id} - {t.title}")
-
-    print("\n=== PLAYLISTS OF USER 1 ===")
-    for p in client.playlists_of_user(1):
-        print(p.name)
-
-    print("\n=== TRACK INFO (ID 1) ===")
-    t = client.track_info(1)
-    print(f"{t.id} - {t.title} - {t.artist}")
+# ============================================================
+# 6) TrackInfo
+# ============================================================
+print("\n=== 6) TRACK INFO (track_id = 1) ===")
+resp = client.TrackInfo(streaming_pb2.TrackIdRequest(track_id=1))
+t = resp.track
+if t:
+    print(f"ID: {t.id}")
+    print(f"Title: {t.title}")
+    print(f"File Path: {t.file_path}")
+else:
+    print("Track not found")

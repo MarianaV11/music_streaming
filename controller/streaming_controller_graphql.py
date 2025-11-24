@@ -5,15 +5,8 @@ from models.streaming_model import User, Track, Playlist
 
 
 # ====================================
-#     TIPOS GRAPHQL (schemas)
+#        TIPOS GRAPHQL (Schemas)
 # ====================================
-
-class UserType(ObjectType):
-    id = Int()
-    username = String()
-    full_name = String()
-    age = Int()
-
 
 class TrackType(ObjectType):
     id = Int()
@@ -26,37 +19,41 @@ class TrackType(ObjectType):
 class PlaylistType(ObjectType):
     id = Int()
     name = String()
+
+    # dono da playlist
     owner = Field(lambda: UserType)
+
+    # músicas da playlist
     tracks = List(lambda: TrackType)
 
 
+class UserType(ObjectType):
+    id = Int()
+    username = String()
+    full_name = String()
+    age = Int()
+
+    # playlists deste usuário
+    playlists = List(lambda: PlaylistType)
+
+
 # ====================================
-#     ROOT QUERY (equivalente REST)
+#        ROOT QUERY
 # ====================================
 
 class Query(ObjectType):
 
-    # /users
     users = List(UserType)
-
-    # /tracks
     tracks = List(TrackType)
 
-    # /users/{id}/playlists
     playlists_of_user = List(PlaylistType, user_id=Int(required=True))
-
-    # /playlists/{id}/tracks
     tracks_of_playlist = List(TrackType, playlist_id=Int(required=True))
 
-    # /tracks/{id}/playlists
     playlists_containing_track = List(PlaylistType, track_id=Int(required=True))
 
-    # /stream/{id} → aqui só retornamos metadados
     track_info = Field(TrackType, track_id=Int(required=True))
 
-    # ------------------------------
-    #   IMPLEMENTAÇÃO DOS RESOLVERS
-    # ------------------------------
+    # -----------------------------------
 
     def resolve_users(root, info):
         db = SessionLocal()

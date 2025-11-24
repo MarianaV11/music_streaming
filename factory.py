@@ -5,6 +5,8 @@ from starlette_graphene3 import GraphQLApp
 from controller.streaming_controller_graphql import schema
 from controller.streaming_controller_rest import router
 from controller.streaming_controller_soap import soap_service
+from controller.streaming_controller_grcp import serve
+
 from database import Base, engine, init_db
 from seed import seed_db
 
@@ -22,16 +24,16 @@ def create_app():
 
         print("→ Inserting datas.")
         seed_db()
-        
+
     # REST
     app.include_router(router, prefix="/api")
 
     # SOAP
     app.mount("/soap", WSGIMiddleware(soap_service))
-    
+
     # GRAPHQL
-    router.add_route("/graphql", GraphQLApp(schema=schema, graphiql=True))
-    
-    # GRPC 
+    app.add_route("/graphql", GraphQLApp(schema=schema))
+
+    serve()
 
     return app
