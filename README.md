@@ -25,14 +25,14 @@ A tabela User possui uma relação de um-para-muitos com Playlist, pois cada usu
 
 Todos os protocolos de comunicação (REST, GraphQL, gRPC, SOAP) implementam os seguintes 6 operações principais:
 
-| Operação | Descrição | Parâmetro |
-|----------|-----------|-----------|
-| **List Users** | Retorna todos os usuários registrados no banco de dados | - |
-| **List Tracks** | Retorna todas as músicas disponíveis para streaming | - |
-| **User Playlists** | Lista as playlists criadas por um usuário específico | `user_id` |
-| **Playlist Tracks** | Retorna todas as músicas presentes em uma playlist | `playlist_id` |
-| **Track Playlists** | Mostra todas as playlists que contêm uma determinada música | `track_id` |
-| **Track Details** | Fornece informações detalhadas de uma música específica | `track_id` |
+| Operação            | Descrição                                                   | Parâmetro     |
+| ------------------- | ----------------------------------------------------------- | ------------- |
+| **List Users**      | Retorna todos os usuários registrados no banco de dados     | -             |
+| **List Tracks**     | Retorna todas as músicas disponíveis para streaming         | -             |
+| **User Playlists**  | Lista as playlists criadas por um usuário específico        | `user_id`     |
+| **Playlist Tracks** | Retorna todas as músicas presentes em uma playlist          | `playlist_id` |
+| **Track Playlists** | Mostra todas as playlists que contêm uma determinada música | `track_id`    |
+| **Track Details**   | Fornece informações detalhadas de uma música específica     | `track_id`    |
 
 ### Streaming de Áudio
 
@@ -45,6 +45,7 @@ A implementação em **REST** oferece suporte nativo a streaming de áudio com s
 REST (Representational State Transfer) utiliza verbos HTTP e URIs para operações em recursos. Implementada em Express.js com suporte completo a **HTTP Range Requests** para streaming progressivo de áudio.
 
 **Características principais:**
+
 - Endpoints estateless baseados em recursos
 - Suporte a requisições parciais (HTTP 206 Partial Content)
 - Permite pause/resume em streaming de áudio
@@ -277,6 +278,7 @@ async def stream_track(track_id: int, request: Request, db: Session = Depends(ge
 SOAP (Simple Object Access Protocol) é um protocolo baseado em XML que permite comunicação entre aplicações de forma mais estruturada e formal. Utiliza conceitos de RPC (Remote Procedure Call) com suporte a serviços complexos e integração corporativa.
 
 **Características principais:**
+
 - Comunicação estruturada via XML
 - Suporte a tipos complexos e arrays
 - WSDL (Web Services Description Language) para definição de serviços
@@ -555,6 +557,7 @@ soap_service = WsgiApplication(soap_app)
 GraphQL é uma linguagem de query e manipulação de dados que oferece maior flexibilidade e eficiência comparado a REST. Permite que clientes solicitem exatamente os dados que precisam, reduzindo transferência desnecessária.
 
 **Características principais:**
+
 - Query language para requisições de dados estruturadas
 - Schema fortemente tipado com validação automática
 - Suporte a resolvers com lógica customizada
@@ -722,6 +725,7 @@ schema = graphene.Schema(query=Query)
 gRPC (gRPC Remote Procedure Call) é um framework de alto desempenho desenvolvido pelo Google que utiliza Protocol Buffers para serialização e HTTP/2 para comunicação. Ideal para arquiteturas de microsserviços.
 
 **Características principais:**
+
 - Comunicação bidirecional via HTTP/2
 - Protocol Buffers para serialização eficiente e tipada
 - Suporte a streaming de dados nativo
@@ -948,6 +952,7 @@ av3_mp3/
 ## Configuração e Instalação
 
 ### Requisitos
+
 - Python >= 3.10
 - Node.js >= 18
 - SQLite3
@@ -1019,16 +1024,19 @@ node js_client.js
 ## Exemplos de Requisições
 
 ### REST - Listar Usuários
+
 ```bash
 curl http://localhost:8000/users
 ```
 
 ### REST - Stream de Áudio (com suporte a Range)
+
 ```bash
 curl -H "Range: bytes=0-10000" http://localhost:8000/stream/1 --output chunk.mp3
 ```
 
 ### GraphQL - Query de Playlists
+
 ```graphql
 query {
   playlists_of_user(user_id: 1) {
@@ -1046,6 +1054,7 @@ query {
 ```
 
 ### SOAP - GetUsers (via XML)
+
 ```xml
 POST /soap HTTP/1.1
 Content-Type: text/xml
@@ -1061,6 +1070,7 @@ Content-Type: text/xml
 ## Dependências Principais
 
 ### Python
+
 - **FastAPI**: Framework web moderno para APIs
 - **SQLAlchemy**: ORM para manipulação de banco de dados
 - **Graphene**: Implementação GraphQL para Python
@@ -1069,6 +1079,7 @@ Content-Type: text/xml
 - **Pydantic**: Validação de dados
 
 ### JavaScript
+
 - **Express.js**: Framework web minimalista
 - **Sequelize**: ORM para JavaScript
 - **Apollo Server**: Servidor GraphQL
@@ -1078,13 +1089,16 @@ Content-Type: text/xml
 ## Notas Técnicas
 
 ### Modelo de Dados
+
 O sistema utiliza um modelo relacional com 3 entidades principais:
+
 - **User** (1:N) → **Playlist** (M:N) ← **Track**
 - Cada usuário pode ter múltiplas playlists
 - Cada playlist pertence a um único usuário
 - Playlists e Tracks possuem relacionamento muitos-para-muitos
 
 ### Streaming de Áudio
+
 - Apenas REST implementa streaming nativo com suporte a HTTP Range Requests
 - Permite pause/resume de arquivos MP3
 - Retorna status HTTP 206 para requisições parciais
@@ -1092,13 +1106,11 @@ O sistema utiliza um modelo relacional com 3 entidades principais:
 
 ### Comparação de Protocolos
 
-| Protocolo | Latência | Throughput | Complexidade | Documentação | Caso de Uso |
-|-----------|----------|-----------|--------------|--------------|-----------|
-| REST | Média | Médio | Baixa | Excelente | Web APIs, Aplicações públicas |
-| GraphQL | Média | Médio | Média | Boa | Clientes móveis, UI complexas |
-| SOAP | Alta | Baixo | Alta | Excelente | Integrações corporativas, Legacy |
-| gRPC | Muito Baixa | Muito Alto | Média | Boa | Microsserviços, Streaming |
+| Protocolo | Latência    | Throughput | Complexidade | Documentação | Caso de Uso                      |
+| --------- | ----------- | ---------- | ------------ | ------------ | -------------------------------- |
+| REST      | Média       | Médio      | Baixa        | Excelente    | Web APIs, Aplicações públicas    |
+| GraphQL   | Média       | Médio      | Média        | Boa          | Clientes móveis, UI complexas    |
+| SOAP      | Alta        | Baixo      | Alta         | Excelente    | Integrações corporativas, Legacy |
+| gRPC      | Muito Baixa | Muito Alto | Média        | Boa          | Microsserviços, Streaming        |
 
 ---
-
-**Desenvolvido como projeto acadêmico para demonstração de arquiteturas de API**
